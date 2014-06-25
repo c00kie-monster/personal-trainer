@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+	http://www.springframework.org/schema/beans/spring-beans.xsd
+	http://www.springframework.org/schema/aop 
+    http://www.springframework.org/schema/aop/spring-aop-4.0.xsd">
+	
+	<bean id="validatorFactory" class="javax.validation.Validation"
+		factory-method="buildDefaultValidatorFactory" />
+
+	<bean id="validator" factory-bean="validatorFactory"
+		factory-method="getValidator" />
+	
+	<bean id="loggingAspect" class="com.kikolski.aop.LoggingAspect" />
+	
+	<bean id="validatingAspect" class="com.kikolski.aop.ValidatingAspect">
+		<property name="validator" ref="validator" />
+	</bean>
+	
+	<aop:config>
+		<aop:aspect id="addLogger" ref="loggingAspect" >
+			<aop:before 
+				pointcut="execution(* com.kikolski.model.service.*.add(..)) and args(object)" 
+				method="addLog" 
+				arg-names="object" />
+		</aop:aspect>		
+		
+		<aop:aspect id="validateAddExercise" ref="validatingAspect">
+			<aop:before 
+			pointcut="execution(* com.kikolski.model.service.ExerciseService.add(..)) and args(object)"
+			method="validateExercise"
+			arg-names="object" 
+			/>
+		</aop:aspect>
+
+		<aop:aspect id="validateAddWorkout" ref="validatingAspect">
+			<aop:before
+			pointcut="execution(* com.kikolski.model.service.WorkoutService.add(..)) and args(object)"
+			method="validateWorkout" 
+			arg-names="object" 
+			/>
+		</aop:aspect>
+		
+		<aop:aspect id="validateEditExercise" ref="validatingAspect">
+			<aop:before
+				pointcut="execution(* com.kikolski.model.service.ExerciseService.update(..)) and args(object)"
+				method="validateExercise"
+				arg-names="object" 
+				/>
+		</aop:aspect>
+	</aop:config>
+    
+    
+    
+</beans>

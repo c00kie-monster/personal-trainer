@@ -1,0 +1,7 @@
+<suite name="Test Suite 1">
+	<test name="Validators Test">
+		<classes>
+			<class name="com.kikolski.ExerciseValidatorTest"/>
+		</classes>
+	</test>
+</suite>

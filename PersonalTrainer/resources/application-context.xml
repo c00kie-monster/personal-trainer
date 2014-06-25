@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+	http://www.springframework.org/schema/beans/spring-beans.xsd
+	http://www.springframework.org/schema/context
+    http://www.springframework.org/schema/context/spring-context.xsd
+    http://www.springframework.org/schema/util 
+    http://www.springframework.org/schema/util/spring-util.xsd
+    http://www.springframework.org/schema/aop 
+    http://www.springframework.org/schema/aop/spring-aop-4.0.xsd">
+	
+	<import resource="aop-config.xml"/>
+	
+	<beans profile="prod">
+		<bean id="dataSource"
+			class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+			<property name="driverClassName" value="${prod.database.driver}" />
+			<property name="url" value="${prod.database.address}" />
+			<property name="username" value="${prod.database.username}" />
+			<property name="password" value="${prod.database.password}" />
+		</bean>
+	</beans>
+
+	<beans profile="dev">
+		<bean id="dataSource"
+			class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+			<property name="driverClassName" value="${dev.database.driver}" />
+			<property name="url" value="${dev.database.address}" />
+			<property name="username" value="${dev.database.username}" />
+			<property name="password" value="${dev.database.password}" />
+		</bean>
+	</beans>
+
+	<beans profile="core">
+		<bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+			<property name="locations">
+				<list>
+					<value>resources/db-parameters.properties</value>
+					<value>resources/utilities.properties</value>
+				</list>
+			</property>
+		</bean>
+	
+		<bean id="sessionFactory" class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
+			<property name="dataSource" ref="dataSource" />
+			<property name="packagesToScan">
+				<list>
+					<value>com.kikolski.model.persistence</value>
+				</list>
+			</property>
+			<property name="hibernateProperties">
+				<props>
+					<prop key="hibernate.dialect">${hibernate.dialect}</prop>
+					<prop key="hibernate.show_sql">${hibernate.show_sql}</prop>
+					<prop key="hibernate.hbm2ddl.auto">${hibernate.auto}</prop>
+					<prop key="hibernate.current_session_context_class">${hibernate.session_context}</prop>
+					<prop key="hibernate.connection.pool_size">${hibernate.pool_size}</prop>
+				</props>
+			</property>
+		</bean>
+	
+		<bean id="model" class="com.kikolski.model.MainModel" />
+
+		<bean id="abstractDAO" class="com.kikolski.model.dao.AbstractDAO" abstract="true">
+			<property name="sessionFactory" ref="sessionFactory" />
+		</bean>
+
+		<bean id="exerciseDAO" class="com.kikolski.model.dao.ExerciseDAO" parent="abstractDAO" />
+
+		<bean id="workoutDAO" class="com.kikolski.model.dao.WorkoutDAO"	parent="abstractDAO" />
+
+		<bean id="validatorFactory" class="javax.validation.Validation" factory-method="buildDefaultValidatorFactory"/>
+		
+		<bean id="validator" factory-bean="validatorFactory" factory-method="getValidator"/>
+
+		<bean id="exerciseService" class="com.kikolski.model.service.ExerciseService">
+			<property name="exerciseDAO" ref="exerciseDAO" />
+		</bean>
+
+		<bean id="workoutService" class="com.kikolski.model.service.WorkoutService">
+			<property name="workoutDAO" ref="workoutDAO" />
+		</bean>
+
+		<bean id="exercise" class="com.kikolski.model.persistence.Exercise"	scope="prototype" />
+	
+		<bean id="workout" class="com.kikolski.model.persistence.Workout" scope="prototype" />
+
+		<util:list id="days" value-type="java.lang.String">
+			<value>${mon}</value>
+			<value>${tue}</value>
+			<value>${wed}</value>
+			<value>${thu}</value>
+			<value>${fri}</value>
+			<value>${sat}</value>
+			<value>${sun}</value>
+		</util:list>
+	</beans>
+
+</beans>
