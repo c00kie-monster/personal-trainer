@@ -40,8 +40,7 @@ public class MainController implements Initializable{
 	@FXML private TreeView<Object> planTree;
 	@FXML private TreeItem<Object> root;
 	@FXML private Label planWorkoutDesc;
-	@FXML private Stage stage;
-	
+		
 	private WorkoutService workoutService = ContextWrapper.getBean(WorkoutService.class);
 	private ExerciseService service = ContextWrapper.getBean(ExerciseService.class);
 	private List<String> trainingDays = (List<String>) ContextWrapper.getBean("days");
@@ -82,7 +81,7 @@ public class MainController implements Initializable{
 	
 	}
 		
-	@FXML private void handleDeleteExerciseAction(ActionEvent event) {
+	@FXML protected void handleDeleteExerciseAction(ActionEvent event) {
 		Exercise exercise = exercisesList.getSelectionModel().getSelectedItem();
 		try{
 			service.delete(exercise);
@@ -119,7 +118,7 @@ public class MainController implements Initializable{
 		}
 	}
 	
-	@FXML private void handleCreateWorkoutAction(ActionEvent event) {
+	@FXML protected void handleCreateWorkoutAction(ActionEvent event) {
 		List<Exercise> selectedExercises = exercisesListForWorkout.getSelectionModel().getSelectedItems();
 		Workout workout = ContextWrapper.getBean(Workout.class);
 		workout.setExercises(selectedExercises);
@@ -205,8 +204,7 @@ public class MainController implements Initializable{
 	private class WorkoutSelectionChangedListener implements ChangeListener<TreeItem> {
 		@Override
 		public void changed(ObservableValue<? extends TreeItem> observable, TreeItem oldValue, TreeItem newValue) {
-			if (newValue != null) {
-				if (newValue.getValue() instanceof Workout) {
+			if (newValue != null && newValue.getValue() instanceof Workout) {
 					Workout selectedWorkout = (Workout) newValue.getValue();
 					StringBuilder desc = new StringBuilder();
 					for (Exercise exercise : selectedWorkout.getExercises()) {
@@ -215,7 +213,6 @@ public class MainController implements Initializable{
 					}
 					planWorkoutDesc.setText(desc.toString());
 				}
-			}
 		}
 	}
 }
