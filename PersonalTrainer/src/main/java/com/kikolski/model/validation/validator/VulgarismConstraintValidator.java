@@ -8,7 +8,7 @@ import javax.validation.ConstraintValidatorContext;
 import com.kikolski.model.validation.interfaces.NotVulgarism;
 
 public class VulgarismConstraintValidator implements ConstraintValidator<NotVulgarism, String>{
-	private final String[] vulgarisms = {"dupa"};
+	private static final String[] vulgarisms = {"dupa"};
 	
 	@Override
 	public void initialize(NotVulgarism word) {}
